@@ -8,10 +8,15 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+interface RepasItem {
+  id: number;
+  date: string;
+  foods: string[];
+}
 
 export default function HomeScreen() {
   const router = useRouter();
-  const [Repas, setRepas] = useState([]);
+  const [Repas, setRepas] = useState<RepasItem[]>([]);
 
   useEffect(() => {
     const loadRepas = async () => {
@@ -31,7 +36,6 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>🍽 Mes repas</Text>
-
       <FlatList
         data={Repas}
         keyExtractor={(item) => item.id.toString()}

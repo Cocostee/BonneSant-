@@ -12,26 +12,29 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { CameraView } from "expo-camera";
+import {
+  CameraView,
+  useCameraPermissions,
+  BarcodeScanningResult,
+} from "expo-camera";
 
-const EDAMAM_API_ID = "a923087c";
-const EDAMAM_API_KEY = "198ed74d598e216599e2df2c55f752f6";
+const EDAMAM_API_ID = process.env.EXPO_PUBLIC_EDAMAM_API_ID;
+const EDAMAM_API_KEY = process.env.EXPO_PUBLIC_EDAMAM_API_KEY;
 
 export default function AddRepas() {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [results, setResults] = useState([]);
   const [selectedFoods, setSelectedFoods] = useState([]);
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [scanned, setScanned] = useState(false);
+  const [permission, requestPermission] = useCameraPermissions();
 
   useEffect(() => {
-    (async () => {
-      const { status } = await CameraView.requestCameraPermissionsAsync();
-      setHasPermission(status === "granted");
-    })();
-  }, []);
+    if (!permission) {
+      requestPermission();
+    }
+  }, [permission]);
 
   const searchFood = async () => {
     if (!search) return;
@@ -46,7 +49,7 @@ export default function AddRepas() {
     }
   };
 
-  const addFood = (food) => {
+  const addFood = (food: never) => {
     if (!selectedFoods.includes(food)) {
       setSelectedFoods([...selectedFoods, food]);
     }
@@ -74,19 +77,19 @@ export default function AddRepas() {
     }
   };
 
-  const handleBarCodeScanned = async ({ data }) => {
+  const handleBarCodeScanned = async ({ data }: BarcodeScanningResult) => {
     if (scanned) return;
     setScanned(true);
     setIsScanning(false);
-
+    console.log("Scanned data:", data);
     try {
       const response = await fetch(
-        `https://api.edamam.com/auto-complete?app_id=${EDAMAM_API_ID}&app_key=${EDAMAM_API_KEY}&q=${data}`
+        `https://api.edamam.com/auto-complete?app_id=${EDAMAM_API_ID}&app_key=${EDAMAM_API_KEY}&upc=${data}`
       );
       const result = await response.json();
 
       if (result.length > 0) {
-        addFood(result[0]); // Ajoute le premier aliment correspondant
+        addFood(result[0]);
       } else {
         alert("Aucun aliment trouvé pour ce QR code.");
       }
@@ -149,8 +152,9 @@ export default function AddRepas() {
         <View style={styles.cameraContainer}>
           <CameraView
             type="back"
+            barcodeScannerEnabled={true}
+            onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
             style={StyleSheet.absoluteFillObject}
-            onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
           />
           <TouchableOpacity
             style={styles.closeButton}
@@ -184,6 +188,25 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     backgroundColor: "white",
   },
+  list: {
+    marginTop: 10,
+  },
+  selectedContainer: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#e0e0e0",
+    borderRadius: 5,
+  },
+  listItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  subtitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
   scanButton: {
     position: "absolute",
     bottom: 30,
@@ -192,6 +215,10 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 50,
     elevation: 5,
+  },
+  selectedFood: {
+    fontSize: 16,
+    marginBottom: 5,
   },
   scanButtonText: {
     color: "white",

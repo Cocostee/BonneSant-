@@ -11,14 +11,33 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const EDAMAM_API_ID = "a923087c";
-const EDAMAM_API_KEY = "198ed74d598e216599e2df2c55f752f6";
+const EDAMAM_API_ID = process.env.EXPO_PUBLIC_EDAMAM_API_ID;
+const EDAMAM_API_KEY = process.env.EXPO_PUBLIC_EDAMAM_API_KEY;
+
+interface Repas {
+  id: string;
+  date: string;
+  foods: string[];
+}
+interface Nutriment {
+  name: string;
+  image: string | null;
+  nutrients: {
+    ENERC_KCAL?: number;
+    PROCNT?: number;
+    FAT?: number;
+    CHOCDF?: number;
+    FIBTG?: number;
+  };
+}
 
 export default function RepasDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const [repas, setRepas] = useState(null);
-  const [nutriments, setNutriments] = useState([]);
+
+  const [repas, setRepas] = useState<Repas | null>(null);
+
+  const [nutriments, setNutriments] = useState<Nutriment[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalCalories, setTotalCalories] = useState(0);
 
@@ -32,7 +51,10 @@ export default function RepasDetailScreen() {
         const storedRepas = await AsyncStorage.getItem("repas");
         if (storedRepas) {
           const repasArray = JSON.parse(storedRepas);
-          const repasFound = repasArray.find((r) => r.id.toString() === id);
+          const repasFound = repasArray.find(
+            (r: { id: { toString: () => string | string[] } }) =>
+              r.id.toString() === id
+          );
           if (repasFound) {
             setRepas(repasFound);
             fetchNutriments(repasFound.foods);
@@ -51,7 +73,10 @@ export default function RepasDetailScreen() {
       const storedRepas = await AsyncStorage.getItem("repas");
       if (storedRepas) {
         const repasArray = JSON.parse(storedRepas);
-        const updatedRepas = repasArray.filter((r) => r.id.toString() !== id);
+        const updatedRepas = repasArray.filter(
+          (r: { id: { toString: () => string | string[] } }) =>
+            r.id.toString() !== id
+        );
         await AsyncStorage.setItem("repas", JSON.stringify(updatedRepas));
         router.push("/");
       }
@@ -60,7 +85,7 @@ export default function RepasDetailScreen() {
     }
   };
 
-  const fetchNutriments = async (foods) => {
+  const fetchNutriments = async (foods: any[]) => {
     try {
       const nutrimentsData = await Promise.all(
         foods.map(async (food) => {
@@ -146,11 +171,10 @@ export default function RepasDetailScreen() {
         </View>
       )}
 
-      {/* Liste des ingrédients */}
       <Text style={styles.ingredientsTitle}>Ingrédients :</Text>
       {repas.foods.map((food, index) => (
         <Text key={index} style={styles.ingredientItem}>
-          - {food}
+          - {String(food)}
         </Text>
       ))}
 
