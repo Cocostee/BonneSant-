@@ -15,13 +15,6 @@ export default function AuthRoutesLayout() {
         name="index"
         options={{
           title: "Home",
-          headerRight: () => (
-            <Link href="/add" asChild>
-              <Pressable>
-                <Text style={{ color: "blue", fontSize: 16 }}>Add</Text>
-              </Pressable>
-            </Link>
-          ),
           headerLeft: () => (
             <Link href="/profile" asChild>
               <Pressable>
