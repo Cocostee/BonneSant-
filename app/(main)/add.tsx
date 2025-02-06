@@ -122,7 +122,7 @@ export default function AddRepas() {
             onPress={() => addFood(item)}
             style={styles.listItem}
           >
-            <Text style={styles.foodText}>{item}</Text>
+            <Text>{item}</Text>
           </TouchableOpacity>
         )}
       />

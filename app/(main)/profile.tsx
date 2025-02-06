@@ -14,7 +14,7 @@ export default function ProfileScreen() {
           <Text style={styles.userInfo}>
             Email: {user.primaryEmailAddress?.emailAddress}
           </Text>
-          <Button title="Sign Out" onPress={signOut} />
+          <Button title="Sign Out" onPress={() => signOut()} />
         </>
       ) : (
         <Text style={styles.userInfo}>Not signed in</Text>
