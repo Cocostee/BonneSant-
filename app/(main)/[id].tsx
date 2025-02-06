@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useLayoutEffect } from "react";
 import {
   View,
   Text,
@@ -40,6 +40,14 @@ export default function RepasDetailScreen() {
   const [nutriments, setNutriments] = useState<Nutriment[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalCalories, setTotalCalories] = useState(0);
+
+  useLayoutEffect(() => {
+    if (repas) {
+      router.setParams({
+        headerTitle: `Information repas`,
+      });
+    }
+  }, [repas]);
 
   useEffect(() => {
     router.setParams({ headerTitle: "Information repas" });

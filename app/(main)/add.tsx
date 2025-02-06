@@ -43,7 +43,7 @@ export default function AddRepas() {
         `https://api.edamam.com/auto-complete?app_id=${EDAMAM_API_ID}&app_key=${EDAMAM_API_KEY}&q=${search}`
       );
       const data = await response.json();
-      setResults(data);
+      setResults(data.slice(0, 5));
     } catch (error) {
       console.error("Erreur lors de la recherche :", error);
     }
@@ -110,7 +110,9 @@ export default function AddRepas() {
         onChangeText={setSearch}
         style={styles.input}
       />
-      <Button title="Rechercher" onPress={searchFood} />
+      <TouchableOpacity style={styles.button} onPress={searchFood}>
+        <Text style={styles.buttonText}>Rechercher</Text>
+      </TouchableOpacity>
 
       <FlatList
         data={results}
@@ -121,24 +123,28 @@ export default function AddRepas() {
             onPress={() => addFood(item)}
             style={styles.listItem}
           >
-            <Text>{item}</Text>
+            <Text style={styles.foodText}>{item}</Text>
           </TouchableOpacity>
         )}
       />
 
       {selectedFoods.length > 0 && (
-        <ScrollView style={styles.selectedContainer}>
+        <View style={styles.selectedContainer}>
           <Text style={styles.subtitle}>Aliments sélectionnés :</Text>
-          {selectedFoods.map((food, index) => (
-            <Text key={index} style={styles.selectedFood}>
-              🍽 {food}
-            </Text>
-          ))}
-        </ScrollView>
+          <ScrollView style={styles.selectedScroll}>
+            {selectedFoods.map((food, index) => (
+              <Text key={index} style={styles.selectedFood}>
+                🍽 {food}
+              </Text>
+            ))}
+          </ScrollView>
+        </View>
       )}
 
       {selectedFoods.length > 0 && (
-        <Button title="Valider le repas" onPress={saveRepas} />
+        <TouchableOpacity style={styles.button} onPress={saveRepas}>
+          <Text style={styles.buttonText}>Valider le repas</Text>
+        </TouchableOpacity>
       )}
 
       <TouchableOpacity
@@ -172,39 +178,67 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f8f8f8",
+    backgroundColor: "#f4f4f4",
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 20,
     textAlign: "center",
+    color: "#333",
   },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
+    padding: 12,
+    borderRadius: 10,
     backgroundColor: "white",
+    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: "#007bff",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginVertical: 10,
+    elevation: 3,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   list: {
     marginTop: 10,
   },
-  selectedContainer: {
-    marginTop: 20,
-    padding: 10,
-    backgroundColor: "#e0e0e0",
-    borderRadius: 5,
-  },
   listItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    padding: 15,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    marginVertical: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  selectedContainer: {
+    height: 150,
+    marginTop: 20,
+    padding: 20,
+    backgroundColor: "#e0e0e0",
+    borderRadius: 10,
+  },
+  selectedScroll: {
+    flex: 1,
   },
   subtitle: {
     fontSize: 18,
     fontWeight: "bold",
+    marginBottom: 10,
+  },
+  selectedFood: {
+    fontSize: 18,
     marginBottom: 10,
   },
   scanButton: {
@@ -215,10 +249,6 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 50,
     elevation: 5,
-  },
-  selectedFood: {
-    fontSize: 16,
-    marginBottom: 5,
   },
   scanButtonText: {
     color: "white",
