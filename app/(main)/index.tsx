@@ -71,7 +71,6 @@ export default function HomeScreen() {
     const loadRepas = async () => {
       try {
         const storedRepas = await AsyncStorage.getItem("repas");
-        console.log(storedRepas);
         if (storedRepas) {
           setRepas(JSON.parse(storedRepas));
         }

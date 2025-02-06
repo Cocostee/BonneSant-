@@ -1,13 +1,12 @@
 import { useAuth } from "@clerk/clerk-expo";
-import { Redirect, Stack, useRouter } from "expo-router";
-import { Button } from "react-native";
+import { Link, Redirect, Stack } from "expo-router";
+import { Pressable, Text } from "react-native";
 
 export default function AuthRoutesLayout() {
   const { isSignedIn } = useAuth();
-  const router = useRouter();
 
   if (!isSignedIn) {
-    return <Redirect href={"/sign-in"} />;
+    return <Redirect href="/sign-in" />;
   }
 
   return (
@@ -17,10 +16,18 @@ export default function AuthRoutesLayout() {
         options={{
           title: "Home",
           headerRight: () => (
-            <Button title="Add" onPress={() => router.push("/add")} />
+            <Link href="/add" asChild>
+              <Pressable>
+                <Text style={{ color: "blue", fontSize: 16 }}>Add</Text>
+              </Pressable>
+            </Link>
           ),
           headerLeft: () => (
-            <Button title="Profile" onPress={() => router.push("/profile")} />
+            <Link href="/profile" asChild>
+              <Pressable>
+                <Text style={{ color: "blue", fontSize: 16 }}>Profile</Text>
+              </Pressable>
+            </Link>
           ),
         }}
       />
