@@ -81,7 +81,6 @@ export default function AddRepas() {
     if (scanned) return;
     setScanned(true);
     setIsScanning(false);
-    console.log("Scanned data:", data);
     try {
       const response = await fetch(
         `https://api.edamam.com/auto-complete?app_id=${EDAMAM_API_ID}&app_key=${EDAMAM_API_KEY}&upc=${data}`
